@@ -104,7 +104,6 @@ class Install extends Command {
 		}
 		if ($input->hasParameterOption('--database-pass')) {
 			$dbPass = (string) $input->getOption('database-pass');
-			$dbPass = trim($dbPass);
 		}
 		$adminLogin = $input->getOption('admin-user');
 		$adminPassword = $input->getOption('admin-pass');
