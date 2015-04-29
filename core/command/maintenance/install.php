@@ -49,7 +49,7 @@ class Install extends Command {
 			->addOption('database-name', null, InputOption::VALUE_REQUIRED, 'Name of the database')
 			->addOption('database-host', null, InputOption::VALUE_REQUIRED, 'Hostname of the database', 'localhost')
 			->addOption('database-user', null, InputOption::VALUE_REQUIRED, 'User name to connect to the database')
-			->addOption('database-pass', null, InputOption::VALUE_REQUIRED, 'Password of the database user', '')
+			->addOption('database-pass', null, InputOption::VALUE_REQUIRED, 'Password of the database user', null)
 			->addOption('database-table-prefix', null, InputOption::VALUE_OPTIONAL, 'Prefix for all tables (default: oc_)', null)
 			->addOption('admin-user', null, InputOption::VALUE_REQUIRED, 'User name of the admin account', 'admin')
 			->addOption('admin-pass', null, InputOption::VALUE_REQUIRED, 'Password of the admin account')
@@ -102,6 +102,10 @@ class Install extends Command {
 			$dbTablePrefix = (string) $input->getOption('database-table-prefix');
 			$dbTablePrefix = trim($dbTablePrefix);
 		}
+		if ($input->hasParameterOption('--database-pass')) {
+			$dbPass = (string) $input->getOption('database-pass');
+			$dbPass = trim($dbPass);
+		}
 		$adminLogin = $input->getOption('admin-user');
 		$adminPassword = $input->getOption('admin-pass');
 		$dataDir = $input->getOption('data-dir');
@@ -112,6 +116,15 @@ class Install extends Command {
 			}
 			if (is_null($dbName)) {
 				throw new InvalidArgumentException("Database name not provided.");
+			}
+			if (is_null($dbPass)) {
+				/** @var $dialog \Symfony\Component\Console\Helper\DialogHelper */
+				$dialog = $this->getHelperSet()->get('dialog');
+				$dbPass = $dialog->askHiddenResponse(
+					$output,
+					"<question>What is the password to access the database with user <$dbUser>?</question>",
+					false
+				);
 			}
 		}
 
